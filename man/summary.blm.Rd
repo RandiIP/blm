@@ -12,7 +12,7 @@
 \item{...}{any extra parameters}
 }
 \value{
-a print with the call, a summary of the residuals, the coefficients, the residual standard error, the R-squared and adjusted R-squared
+a print with the call, a summary of the residuals, the coefficients, the residual standard error, the R-squared and adjusted R-squared and an object with the coefficients, confint, deviance, fitted values and the residuals.
 }
 \description{
 This function prints the more extensive information from the object

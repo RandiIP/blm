@@ -17,7 +17,7 @@ blm(formula, data, prior = NULL, alpha = 1, beta, n = 2)
 
 \item{beta}{the beta value}
 
-\item{n}{the number of parameters in the model including the response, only needed if alpha isn't provided, default = 2}
+\item{n}{the number of parameters in the model including the response, only needed if prior isn't provided, default = 2}
 }
 \value{
 an object of class blm with a list containing the call, the fitted posterior, the model, beta and the data.

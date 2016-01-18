@@ -7,7 +7,7 @@
 #' @param prior the prior distribution, default = NULL, if not a blm object provide values for alpha and n
 #' @param alpha the alpha value, only needed if prior isn't provided, default = 1
 #' @param beta the beta value
-#' @param n the number of parameters in the model including the response, only needed if alpha isn't provided, default = 2
+#' @param n the number of parameters in the model including the response, only needed if prior isn't provided, default = 2
 #' @return an object of class blm with a list containing the call, the fitted posterior, the model, beta and the data.
 #'
 #' @export
@@ -17,6 +17,8 @@ blm <- function(formula, data, prior = NULL, alpha = 1, beta, n = 2) {
   } else if (class(prior) == "blm") { # extract posterior as prior if blm object is provided
     dist = prior
     prior = dist$posterior
+  } else {
+    stop("invalid 'prior' given, class should be blm, else provide n and alpha")
   }
 
   posterior = fit_model(formula, data, prior, beta)
@@ -26,6 +28,6 @@ blm <- function(formula, data, prior = NULL, alpha = 1, beta, n = 2) {
                  model = formula,
                  beta = beta,
                  data = data,
-                 df.residual = dim(data)[1] - (dim(data)[2] - 1) - 1),
+                 residualDF = dim(data)[1] - (dim(data)[2] - 1) - 1),
             class = "blm")
 }

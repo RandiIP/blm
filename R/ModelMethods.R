@@ -14,7 +14,7 @@ coef.blm <- function(object, ...) object$posterior$mean[,1]
 #' This function calculates the confidence intervals of all the estimates in a blm object
 #'
 #' @param object the blm object
-#' @param parm a vector of parameter names (the response is called Intercept) or a numeric vector with the wanted parameters
+#' @param parm a vector of parameter names or a numeric vector with the wanted parameters
 #' @param level the desired confidence level, default = 0.95
 #' @param ... any extra parameters
 #' @return a matrix with all the confidence intervals for the estimates
@@ -54,10 +54,7 @@ confint.blm <- function(object, parm, level = 0.95, ...) {
 #'
 #' @export
 deviance.blm <- function(object, ...) {
-  observed = object$data[,1]
-  predicted = predict.blm(object)$mean
-
-  sum((observed-predicted)**2)
+  sum(residuals(object)**2)
 }
 
 #' The predicted response of a blm object
@@ -112,24 +109,37 @@ residuals.blm <- function(object, ...) {
 #' This function makes plots of a blm object.
 #'
 #' @param x the blm object
-#' @param param a vector with the name of the responsevariable and the name of the predictor varialbe to be plotted. Onlye the first two variables in the vector is considered.
+#' @param parm a vector with the name of the responsevariable and the name of the predictor varialbe to be plotted. Only the first two variables in the vector is considered. Default NULL. If not provided the first predictor in the model will be used as predictor.
 #' @param ... any extra parameters
 #' @return a x-y plot with the data points and the line from the blm-fit and a residual plot
 #'
 #' @export
-plot.blm <- function(x, param, ...) {
+plot.blm <- function(x, parm = NULL, ...) {
+  if (is.null(parm)) {
+    parm = c(all.vars(x$model)[1],all.vars(x$model)[2])
+  }
+
   devAskNewPage(TRUE)
-  response = unlist(x$data[param[1]])
-  predictor = unlist(x$data[param[2]])
+  response = unlist(x$data[parm[1]])
+  predictor = unlist(x$data[parm[2]])
 
   intercept = coef.blm(x)[1]
-  slope = coef.blm(x)[param[2]]
+  slope = coef.blm(x)[parm[2]]
 
-  plot(predictor, response, xlim = c(min(predictor)-1,max(predictor)+1), ylim = c(min(response)-1,max(response)+1), xlab = param[2], ylab = param[1], main = paste("Scatterplot of ", param[1], " as a function of ", param[2], "\nplotted with the fitted blm regression line", sep=""))
+  plot(predictor, response, xlim = c(min(predictor)-1,max(predictor)+1), ylim = c(min(response)-1,max(response)+1), xlab = parm[2], ylab = parm[1], main = paste("Scatterplot of ", parm[1], " as a function of ", parm[2], "\nplotted with the fitted blm regression line", sep=""))
   abline(a = intercept, b = slope, col = "red")
 
   residual = residuals.blm(x)
-  plot(predictor, residual, xlim = c(min(predictor)-0.2,max(predictor)+0.2), ylim = c(min(residual)-0.2,max(residual)+0.2), xlab = param[2], ylab = "Residuals", main = "Residualplot")
+
+  if (length(labels(terms(x$model))) == 1) {
+    fit = predictor
+    xlabel = parm[2]
+  } else {
+    fit = fitted.blm(x)$mean
+    xlabel = "Fitted"
+  }
+
+  plot(x = fit, y = residual, xlim = c(min(fit)-0.2,max(fit)+0.2), ylim = c(min(residual)-0.2,max(residual)+0.2), xlab = xlabel, ylab = "Residuals", main = "Residualplot")
   abline(h=0, col = "darkgray", lty = 2)
 }
 
@@ -153,7 +163,7 @@ print.blm <- function(x, ...) {
 #'
 #' @param object the blm object
 #' @param ... any extra parameters
-#' @return a print with the call, a summary of the residuals, the coefficients, the residual standard error, the R-squared and adjusted R-squared
+#' @return a print with the call, a summary of the residuals, the coefficients, the residual standard error, the R-squared and adjusted R-squared and an object with the coefficients, confint, deviance, fitted values and the residuals.
 #'
 #' @export
 summary.blm <- function(object, ...) {
@@ -169,7 +179,14 @@ summary.blm <- function(object, ...) {
   print(resi_stat)
   cat(paste("\n", "Coefficients:\n", sep=""))
   print(coef.blm(object))
-  cat(paste("\n", "Residual standard error: ", RSE, ", with ", object$df.residual, " degrees of freedom", sep=""))
+  cat(paste("\n", "Residual standard error: ", RSE, ", with ", object$residualDF, " degrees of freedom", sep=""))
   cat(paste("\n", "R-squared: ", R2, ", Adjusted R-squared ", AR2, sep=""))
+
+  return(invisible(structure(list(coefficients = coef(object),
+                                  confint = confint(object),
+                                  deviance = deviance(object),
+                                  fitted = fitted(object),
+                                  residuals = residuals(object)),
+                             class = "summary.blm")))
 }
 

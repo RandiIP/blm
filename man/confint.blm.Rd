@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{the blm object}
 
-\item{parm}{a vector of parameter names (the response is called Intercept) or a numeric vector with the wanted parameters}
+\item{parm}{a vector of parameter names or a numeric vector with the wanted parameters}
 
 \item{level}{the desired confidence level, default = 0.95}
 

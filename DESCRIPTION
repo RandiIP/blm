@@ -1,15 +1,13 @@
 Package: blm
 Type: Package
 Title: Fit Bayesian Linear Regression Models
-Version: 0.0.0.9000
+Version: 1.0.0
 Date: 2015-12-11
 Authors@R: person("Randi Istrup", "Perdersen", email = "randi.istrup.pedersen@post.au.dk", role = c("aut","cre"))
 Description: Fit data using baysian linear regression. Provided with a prior
     distribution (or alpha and the number of parameters) it calculates the posterior
     distribution and can be used for prediction of response from new data.
 License: file LICENSE
-Imports: 
-  MASS
 LazyData: TRUE
 RoxygenNote: 5.0.1
 Suggests: testthat
